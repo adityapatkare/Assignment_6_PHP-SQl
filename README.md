@@ -189,28 +189,23 @@ ecommerce/
 │ ├── reports.php
 │ ├── settings.php
 │ └── includes/
-
 ├── vendor/
 │ ├── index.php
 │ ├── dashboard.php
 │ ├── products.php
 │ ├── orders.php
 │ └── includes/
-
 ├── api/
 │ ├── auth.php
 │ ├── login.php
 │ ├── products.php
 │ └── orders.php
-
 ├── includes/
 │ ├── header.php
 │ └── footer.php
-
 ├── uploads/
 │ ├── screenshots/
 │ └── includes/
-
 ├── db.php
 ├── index.php
 ├── product.php
@@ -223,7 +218,6 @@ ecommerce/
 ├── contact.php
 ├── search.php
 ├── update_cart.php
-
 └── README.md
 
 ---
