@@ -8,6 +8,7 @@ The application allows Customers, Vendors, and Administrators to interact throug
 
 The project is inspired by modern e-commerce platforms and follows a database-driven architecture with authentication, vendor management, analytics, product variations, API endpoints, and security best practices.
 
+Test Link: http://asignment.rf.gd/?i=1
 ---
 
 ## Features
