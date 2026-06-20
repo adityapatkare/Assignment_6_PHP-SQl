@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 include "db.php";
 include "includes/header.php";
 ?>
@@ -7,14 +10,15 @@ include "includes/header.php";
 
 <?php
 $banner = $conn->query("SELECT * FROM banners WHERE status=1 ORDER BY id DESC LIMIT 1")->fetch_assoc();
+$bannerImage = !empty($banner['image']) ? 'uploads/' . htmlspecialchars($banner['image']) : 'uploads/banner.jpg';
 ?>
 
 <div class="hero-section mb-5"
-     onclick="window.location='<?php echo $banner['link'] ?? '#'; ?>'"
+     onclick="window.location='<?php echo htmlspecialchars($banner['link'] ?? '#'); ?>'"
      style="cursor:pointer;
             height:350px;
             border-radius:10px;
-            background:url('uploads/<?php echo $banner['image'] ?? 'banner.jpg'; ?>') center/cover no-repeat;">
+            background:url('<?php echo $bannerImage; ?>') center/cover no-repeat;">
 </div>
 
 <!-- SEARCH + CATEGORIES INLINE -->
@@ -44,7 +48,7 @@ $banner = $conn->query("SELECT * FROM banners WHERE status=1 ORDER BY id DESC LI
             ?>
                 <button class="btn btn-outline-light btn-sm"
                         onclick="window.location='search.php?category=<?php echo $c['id']; ?>'">
-                    <?php echo $c['name']; ?>
+                    <?php echo htmlspecialchars($c['name']); ?>
                 </button>
             <?php } ?>
 
@@ -72,7 +76,7 @@ if ($result->num_rows > 0) {
              onclick="window.location='product.php?id=<?php echo $row['id']; ?>'">
 
             <?php if (!empty($row['image'])) { ?>
-                <img src="uploads/<?php echo $product['image']; ?>"
+                <img src="./uploads/<?php echo htmlspecialchars($row['image']); ?>"
                      class="card-img-top" 
                      style="height:200px; object-fit:contain;">
             <?php } else { ?>
@@ -83,13 +87,13 @@ if ($result->num_rows > 0) {
 
             <div class="card-body d-flex flex-column">
 
-                <h5><?php echo $row['name']; ?></h5>
+                <h5><?php echo htmlspecialchars($row['name']); ?></h5>
 
                 <p class="text-muted small">
-                    <?php echo substr($row['description'], 0, 60); ?>...
+                    <?php echo htmlspecialchars(substr($row['description'], 0, 60)); ?>...
                 </p>
 
-                <h6 class="mt-auto fw-bold">₹<?php echo $row['price']; ?></h6>
+                <h6 class="mt-auto fw-bold">₹<?php echo htmlspecialchars($row['price']); ?></h6>
 
                 <form method="POST" action="cart.php"
                       onclick="event.stopPropagation();">
@@ -121,12 +125,7 @@ if ($result->num_rows > 0) {
 
 /* HERO IMAGE */
 .hero-section {
-    height: 300px;
-    border-radius: 10px;
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-                url('uploads/banner.jpg'); /* add your image here */
-    background-size: cover;
-    background-position: center;
+    transition: 0.3s;
 }
 
 /* PRODUCT HOVER */
