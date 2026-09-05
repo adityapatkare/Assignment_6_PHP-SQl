@@ -8,6 +8,45 @@ The application allows Customers, Vendors, and Administrators to interact throug
 
 The project is inspired by modern e-commerce platforms and follows a database-driven architecture with authentication, vendor management, analytics, product variations, API endpoints, and security best practices.
 
+Test Link: http://asignment.rf.gd/
+## Demo Credentials
+
+### Admin
+
+URL:
+https://asignment.rf.gd/admin/index.php
+
+Username:
+admin@test.com
+
+Password:
+admin123
+
+---
+
+### Vendor
+
+URL:
+https://asignment.rf.gd/vendor/index.php
+
+Email:
+jane@gmail.com
+
+Password:
+P@ssword
+
+---
+
+### Customer
+
+URL:
+https://asignment.rf.gd/login.php
+
+Email:
+admin@test.com or adipatkare@gmail.com
+
+Password:
+admin123 or P@ssword
 ---
 
 ## Features
@@ -189,28 +228,23 @@ ecommerce/
 │ ├── reports.php
 │ ├── settings.php
 │ └── includes/
-
 ├── vendor/
 │ ├── index.php
 │ ├── dashboard.php
 │ ├── products.php
 │ ├── orders.php
 │ └── includes/
-
 ├── api/
 │ ├── auth.php
 │ ├── login.php
 │ ├── products.php
 │ └── orders.php
-
 ├── includes/
 │ ├── header.php
 │ └── footer.php
-
 ├── uploads/
 │ ├── screenshots/
 │ └── includes/
-
 ├── db.php
 ├── index.php
 ├── product.php
@@ -223,7 +257,6 @@ ecommerce/
 ├── contact.php
 ├── search.php
 ├── update_cart.php
-
 └── README.md
 
 ---
