@@ -6,15 +6,16 @@ This project is a full-stack dynamic Multi-Vendor E-Commerce Platform developed 
 
 The application allows Customers, Vendors, and Administrators to interact through dedicated panels and role-based access control. All products, categories, banners, coupons, orders, and featured sections are dynamically managed through the database.
 
-The project is inspired by modern e-commerce platforms and follows a database-driven architecture with authentication, vendor management, analytics, product variations, API endpoints, and security best practices.
+The project is inspired by modern e-commerce platforms and follows a database-driven architecture with authentication, vendor management, analytics, product variations, multi-image product galleries, API endpoints, and security best practices.
 
-Test Link: http://asignment.rf.gd/
+Test Link: https://paleturquoise-shrew-583501.hostingersite.com/
+
 ## Demo Credentials
 
 ### Admin
 
 URL:
-https://asignment.rf.gd/admin/index.php
+https://paleturquoise-shrew-583501.hostingersite.com/admin/index.php
 
 Username:
 admin@test.com
@@ -27,7 +28,7 @@ admin123
 ### Vendor
 
 URL:
-https://asignment.rf.gd/vendor/index.php
+https://paleturquoise-shrew-583501.hostingersite.com/vendor/index.php
 
 Email:
 jane@gmail.com
@@ -40,13 +41,14 @@ P@ssword
 ### Customer
 
 URL:
-https://asignment.rf.gd/login.php
+https://paleturquoise-shrew-583501.hostingersite.com/login.php
 
 Email:
 admin@test.com or adipatkare@gmail.com
 
 Password:
 admin123 or P@ssword
+
 ---
 
 ## Features
@@ -58,11 +60,14 @@ admin123 or P@ssword
 - Dynamic Homepage
 - Product Search & Filters
 - Product Detail Page
+- Multiple Product Images (Gallery)
 - Product Variations (Size & Color)
+- Color Swatch Selection
 - Shopping Cart
 - Checkout & Order Placement
 - Order History
 - Product Reviews & Ratings
+- Wishlist
 - User Profile Management
 - Contact & Feedback Form
 - Responsive Design
@@ -75,6 +80,7 @@ admin123 or P@ssword
 - Vendor Dashboard
 - Vendor Analytics
 - Product Management (CRUD)
+- Multiple Product Image Uploads
 - Inventory Management
 - Order Management
 - Sales Tracking
@@ -85,8 +91,8 @@ admin123 or P@ssword
 
 - Admin Login
 - Dashboard Analytics
-- Product Management
-- Category Management
+- Product Management (CRUD, multi-image gallery)
+- Category Management (CRUD with image upload)
 - Vendor Management
 - User Management
 - Order Management
@@ -117,24 +123,27 @@ ecommerce_db
 
 ### Database Tables
 
-| Table              | Description                       |
-| ------------------ | --------------------------------- |
-| users              | Customer and vendor user accounts |
-| vendors            | Vendor information                |
-| products           | Product catalog                   |
-| product_variations | Product size/color variations     |
-| categories         | Product categories                |
-| orders             | Customer orders                   |
-| order_items        | Order details                     |
-| coupons            | Discount coupons                  |
-| reviews            | Product ratings and reviews       |
-| feedback           | Contact form submissions          |
-| banners            | Homepage banners                  |
-| admin              | Administrator accounts            |
+| Table               | Description                              |
+| ------------------- | ----------------------------------------- |
+| users               | Customer and vendor user accounts         |
+| vendors             | Vendor information                        |
+| products            | Product catalog                           |
+| product_images      | Additional gallery images per product     |
+| product_variations  | Product size/color variations             |
+| categories          | Product categories (with image support)   |
+| orders              | Customer orders                           |
+| order_items         | Order details                             |
+| coupons             | Discount coupons                          |
+| reviews             | Product ratings and reviews               |
+| feedback            | Contact form submissions                  |
+| banners             | Homepage banners                          |
+| admin               | Administrator accounts                    |
 
 ### Database Features
 
 - Product Variations
+- Multi-Image Product Galleries
+- Category Images
 - Order Tracking
 - Vendor Mapping
 - Reviews & Ratings
@@ -162,6 +171,7 @@ The project implements the following security practices:
 - Role-Based Access Control
 - Input Validation
 - Data Sanitization
+- Prepared Statements for Insert/Update Operations
 - API Security Headers
 - CORS Configuration
 - Protected Admin Routes
@@ -215,36 +225,37 @@ The project implements the following security practices:
 
 ## Project Structure
 
+```
 ecommerce/
-
 ├── admin/
-│ ├── index.php
-│ ├── dashboard.php
-│ ├── products.php
-│ ├── categories.php
-│ ├── vendors.php
-│ ├── orders.php
-│ ├── coupons.php
-│ ├── reports.php
-│ ├── settings.php
-│ └── includes/
+│   ├── index.php
+│   ├── dashboard.php
+│   ├── products.php
+│   ├── categories.php
+│   ├── vendors.php
+│   ├── orders.php
+│   ├── coupons.php
+│   ├── reports.php
+│   ├── settings.php
+│   └── includes/
 ├── vendor/
-│ ├── index.php
-│ ├── dashboard.php
-│ ├── products.php
-│ ├── orders.php
-│ └── includes/
+│   ├── index.php
+│   ├── dashboard.php
+│   ├── products.php
+│   ├── orders.php
+│   └── includes/
 ├── api/
-│ ├── auth.php
-│ ├── login.php
-│ ├── products.php
-│ └── orders.php
+│   ├── auth.php
+│   ├── login.php
+│   ├── products.php
+│   └── orders.php
 ├── includes/
-│ ├── header.php
-│ └── footer.php
+│   ├── header.php
+│   └── footer.php
 ├── uploads/
-│ ├── screenshots/
-│ └── includes/
+│   ├── categories/
+│   ├── screenshots/
+│   └── includes/
 ├── db.php
 ├── index.php
 ├── product.php
@@ -258,6 +269,7 @@ ecommerce/
 ├── search.php
 ├── update_cart.php
 └── README.md
+```
 
 ---
 
@@ -267,8 +279,8 @@ The repository contains a dedicated screenshots folder demonstrating the major f
 
 ### Screenshots Included
 
+```
 screenshots/
-
 ├── homepage.png
 ├── product-page.png
 ├── cart.png
@@ -279,17 +291,20 @@ screenshots/
 ├── vendor-dashboard.png
 ├── vendor-products.png
 ├── orders-management.png
+```
 
 ### Demonstrated Features
 
 - Homepage
 - Dynamic Products
 - Product Variations
+- Multi-Image Product Gallery
 - Shopping Cart
 - Checkout Process
 - User Profile
 - Admin Dashboard
 - Product Management
+- Category Management
 - Vendor Dashboard
 - Vendor Product Management
 - Order Management
@@ -303,8 +318,9 @@ screenshots/
 
 Clone the repository
 
-bash
+```bash
 git clone YOUR_GITHUB_REPOSITORY_URL
+```
 
 ### Step 2
 
@@ -318,14 +334,17 @@ into MySQL using phpMyAdmin.
 
 Configure database credentials inside:
 
-php
+```php
 db.php
+```
 
 ### Step 4
 
 Place the project folder inside:
 
+```
 xampp/htdocs/
+```
 
 ### Step 5
 
@@ -340,7 +359,9 @@ from XAMPP Control Panel.
 
 Open the project:
 
+```
 http://localhost/project-folder-name
+```
 
 ---
 
@@ -354,8 +375,8 @@ Access:
 
 Capabilities:
 
-- Manage Products
-- Manage Categories
+- Manage Products (with multi-image galleries)
+- Manage Categories (with image upload)
 - Manage Vendors
 - Manage Orders
 - Manage Coupons
@@ -388,6 +409,7 @@ Access:
 Capabilities:
 
 - Browse Products
+- View Product Image Galleries
 - Place Orders
 - Manage Profile
 - Submit Reviews
@@ -401,7 +423,8 @@ Capabilities:
 
 - Dynamic Homepage
 - Product Details
-- Product Variations
+- Multi-Image Product Gallery
+- Product Variations (Size & Color Swatches)
 - Search & Filters
 - Cart System
 - Checkout System
@@ -413,8 +436,8 @@ Capabilities:
 ### Admin Panel
 
 - Dashboard
-- Product CRUD
-- Category CRUD
+- Product CRUD (multi-image support)
+- Category CRUD (image support)
 - Vendor Management
 - Order Management
 - Coupon Management
@@ -436,12 +459,14 @@ Capabilities:
 - Session Management
 - Password Hashing
 - Input Validation
+- Prepared Statements
 - CORS Support
 
 ### Database
 
 - Fully Dynamic Content
 - Product Variations
+- Multi-Image Galleries
 - Reviews
 - Feedback
 - Coupons
@@ -453,7 +478,6 @@ Capabilities:
 
 - Razorpay Integration
 - Stripe Integration
-- Wishlist System
 - Recently Viewed Products
 - Newsletter Integration
 - SEO-Friendly URLs
