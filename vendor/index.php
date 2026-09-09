@@ -38,8 +38,8 @@ if (isset($_POST['login'])) {
 
     <style>
         body {
-            background: #0f172a;
-            color: #fff;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            color: #0f172a;
             font-family: 'Segoe UI', sans-serif;
         }
 
@@ -48,23 +48,24 @@ if (isset($_POST['login'])) {
         }
 
         .login-card {
-            background: #020617;
+            background: #ffffff;
             border-radius: 12px;
             padding: 30px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         .form-control {
-            background: #020617;
-            border: 1px solid #334155;
-            color: #fff;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+            border-radius: 8px;
         }
 
         .form-control:focus {
-            background: #020617;
-            color: #fff;
+            background: #ffffff;
+            color: #0f172a;
             border-color: #6366f1;
             box-shadow: none;
         }

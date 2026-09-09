@@ -1,0 +1,287 @@
+<?php
+session_start();
+include "../db.php";
+
+if (!isset($_SESSION['vendor_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
+include "includes/header.php";
+
+$vendor_user_id = $_SESSION['vendor_id'];
+
+/*
+|--------------------------------------------------------------------------
+| GET VENDOR DETAILS
+|--------------------------------------------------------------------------
+*/
+$vendorQuery = $conn->query("
+    SELECT * FROM vendors
+    WHERE user_id = '$vendor_user_id'
+");
+
+if (!$vendorQuery || $vendorQuery->num_rows == 0) {
+    ?>
+
+    <div class="container mt-5">
+        <div class="alert alert-danger">
+            Vendor account not found.
+            <br><br>
+
+            <strong>Fix:</strong>
+
+            <ol>
+                <li>Open phpMyAdmin</li>
+                <li>Open vendors table</li>
+                <li>Make sure a record exists for this user</li>
+            </ol>
+        </div>
+    </div>
+
+    <?php
+    include "includes/footer.php";
+    exit;
+}
+
+$vendor = $vendorQuery->fetch_assoc();
+$vendor_id = $vendor['id'];
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD STATS
+|--------------------------------------------------------------------------
+*/
+
+$sales = $conn->query("
+SELECT SUM(oi.price * oi.quantity) as total
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id
+WHERE p.vendor_id = '$vendor_id'
+");
+
+$total_sales = $sales->fetch_assoc()['total'] ?? 0;
+
+$orders = $conn->query("
+SELECT COUNT(DISTINCT oi.order_id) as total
+FROM order_items oi
+JOIN products p ON oi.product_id = p.id
+WHERE p.vendor_id = '$vendor_id'
+");
+
+$total_orders = $orders->fetch_assoc()['total'] ?? 0;
+
+$products = $conn->query("
+SELECT COUNT(*) as total
+FROM products
+WHERE vendor_id='$vendor_id'
+");
+
+$total_products = $products->fetch_assoc()['total'] ?? 0;
+
+/*
+|--------------------------------------------------------------------------
+| RECENT ORDERS
+|--------------------------------------------------------------------------
+*/
+
+$recent_orders = $conn->query("
+SELECT
+o.id,
+o.status,
+o.created_at,
+p.name,
+oi.quantity,
+oi.price
+
+FROM order_items oi
+
+JOIN products p
+ON oi.product_id = p.id
+
+JOIN orders o
+ON oi.order_id = o.id
+
+WHERE p.vendor_id = '$vendor_id'
+
+ORDER BY o.id DESC
+LIMIT 10
+");
+?>
+
+<div class="container-fluid">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Vendor Dashboard</h2>
+            <small class="text-muted">
+                Welcome, <?php echo $vendor['name']; ?>
+            </small>
+        </div>
+    </div>
+
+    <!-- STATS -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-secondary">
+                        Total Sales
+                    </h6>
+
+                    <h2 class="fw-bold text-success">
+                        ₹<?php echo number_format($total_sales, 2); ?>
+                    </h2>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-secondary">
+                        Total Orders
+                    </h6>
+
+                    <h2 class="fw-bold">
+                        <?php echo $total_orders; ?>
+                    </h2>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-secondary">
+                        Products
+                    </h6>
+
+                    <h2 class="fw-bold">
+                        <?php echo $total_products; ?>
+                    </h2>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- RECENT ORDERS -->
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-header bg-white">
+            <h5 class="mb-0">
+                Recent Orders
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+
+                    <thead>
+
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <?php if ($recent_orders->num_rows > 0) { ?>
+
+                        <?php while($row = $recent_orders->fetch_assoc()) { ?>
+
+                            <tr>
+
+                                <td>
+                                    #<?php echo $row['id']; ?>
+                                </td>
+
+                                <td>
+                                    <?php echo $row['name']; ?>
+                                </td>
+
+                                <td>
+                                    <?php echo $row['quantity']; ?>
+                                </td>
+
+                                <td>
+                                    ₹<?php echo number_format($row['price'],2); ?>
+                                </td>
+
+                                <td>
+
+                                    <?php
+                                    $status = $row['status'];
+
+                                    if ($status == "Delivered") {
+                                        echo "<span class='badge bg-success'>$status</span>";
+                                    }
+                                    elseif ($status == "Shipped") {
+                                        echo "<span class='badge bg-info'>$status</span>";
+                                    }
+                                    elseif ($status == "Processing") {
+                                        echo "<span class='badge bg-warning text-dark'>$status</span>";
+                                    }
+                                    else {
+                                        echo "<span class='badge bg-secondary'>$status</span>";
+                                    }
+                                    ?>
+
+                                </td>
+
+                                <td>
+                                    <?php echo date("d M Y", strtotime($row['created_at'])); ?>
+                                </td>
+
+                            </tr>
+
+                        <?php } ?>
+
+                    <?php } else { ?>
+
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                No orders found
+                            </td>
+                        </tr>
+
+                    <?php } ?>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<?php include "includes/footer.php"; ?>

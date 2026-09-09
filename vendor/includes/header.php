@@ -91,11 +91,6 @@ if (!isset($_SESSION['vendor_id'])) {
 
 <body class="light" id="body">
 
-<!-- THEME BUTTON -->
-<button class="btn btn-light btn-theme" onclick="toggleTheme()">
-    <i class="fa fa-moon"></i>
-</button>
-
 <!-- SIDEBAR -->
 <div class="sidebar">
     <h4>Vendor Panel</h4>

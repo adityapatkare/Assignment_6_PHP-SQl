@@ -105,3 +105,5 @@ SELECT COUNT(*) as total FROM products WHERE vendor_id=$vid
 
     </table>
 </div>
+
+

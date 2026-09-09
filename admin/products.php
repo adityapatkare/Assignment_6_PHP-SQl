@@ -10,6 +10,7 @@ if (!isset($_SESSION['admin'])) {
 
 $message = "";
 $edit_data = null;
+$edit_images = [];
 
 /* =========================
    CREATE UPLOAD FOLDER
@@ -33,6 +34,40 @@ if (isset($_GET['edit'])) {
     if ($edit_query && $edit_query->num_rows > 0) {
         $edit_data = $edit_query->fetch_assoc();
     }
+
+    $img_query = $conn->query("
+        SELECT * FROM product_images
+        WHERE product_id = $edit_id
+    ");
+
+    if ($img_query) {
+        while ($img_row = $img_query->fetch_assoc()) {
+            $edit_images[] = $img_row;
+        }
+    }
+}
+
+/* =========================
+   DELETE SINGLE GALLERY IMAGE
+========================= */
+if (isset($_GET['delete_image'])) {
+
+    $img_id = (int) $_GET['delete_image'];
+    $back_to = (int) ($_GET['product_id'] ?? 0);
+
+    $img_res = $conn->query("SELECT image FROM product_images WHERE id = $img_id");
+
+    if ($img_res && $img_row = $img_res->fetch_assoc()) {
+        $path = "../uploads/" . $img_row['image'];
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
+
+    $conn->query("DELETE FROM product_images WHERE id = $img_id");
+
+    header("Location: products.php?edit=$back_to");
+    exit;
 }
 
 /* =========================
@@ -41,6 +76,20 @@ if (isset($_GET['edit'])) {
 if (isset($_GET['delete'])) {
 
     $id = (int) $_GET['delete'];
+
+    // DELETE GALLERY IMAGE FILES
+    $gallery = $conn->query("SELECT image FROM product_images WHERE product_id = $id");
+    if ($gallery) {
+        while ($g = $gallery->fetch_assoc()) {
+            $path = "../uploads/" . $g['image'];
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+    }
+
+    // DELETE GALLERY RECORDS
+    $conn->query("DELETE FROM product_images WHERE product_id = $id");
 
     // DELETE VARIATIONS
     $conn->query("
@@ -61,6 +110,44 @@ if (isset($_GET['delete'])) {
 }
 
 /* =========================
+   HELPER: SAVE GALLERY IMAGES
+========================= */
+function save_gallery_images($conn, $product_id, $files) {
+
+    $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+
+    if (empty($files['name'][0])) {
+        return;
+    }
+
+    foreach ($files['name'] as $index => $file_name) {
+
+        if ($files['error'][$index] !== 0) {
+            continue;
+        }
+
+        $ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, $allowed)) {
+            continue;
+        }
+
+        $new_name = time() . "_" . $index . "_" . preg_replace("/[^a-zA-Z0-9.]/", "", $file_name);
+        $destination = "../uploads/" . $new_name;
+
+        if (move_uploaded_file($files['tmp_name'][$index], $destination)) {
+
+            $stmt = $conn->prepare("
+                INSERT INTO product_images (product_id, image)
+                VALUES (?, ?)
+            ");
+            $stmt->bind_param("is", $product_id, $new_name);
+            $stmt->execute();
+        }
+    }
+}
+
+/* =========================
    ADD PRODUCT
 ========================= */
 if (isset($_POST['add_product'])) {
@@ -77,7 +164,7 @@ if (isset($_POST['add_product'])) {
 
     $image = "";
 
-    /* IMAGE UPLOAD */
+    /* MAIN IMAGE UPLOAD */
     if (!empty($_FILES['image']['name'])) {
 
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
@@ -93,18 +180,11 @@ if (isset($_POST['add_product'])) {
 
             $destination = "../uploads/" . $image;
 
-            if (move_uploaded_file($tmp_name, $destination)) {
-
-                $message = "
-                <div class='alert alert-success'>
-                    Image uploaded successfully
-                </div>";
-
-            } else {
-
+            if (!move_uploaded_file($tmp_name, $destination)) {
+                $image = "";
                 $message = "
                 <div class='alert alert-danger'>
-                    Failed to upload image
+                    Failed to upload main image
                 </div>";
             }
 
@@ -146,6 +226,11 @@ if (isset($_POST['add_product'])) {
     if ($insert) {
 
         $product_id = $conn->insert_id;
+
+        /* SAVE GALLERY IMAGES */
+        if (!empty($_FILES['images']['name'][0])) {
+            save_gallery_images($conn, $product_id, $_FILES['images']);
+        }
 
         /* SAVE SIZES */
         if (!empty($_POST['sizes'])) {
@@ -241,7 +326,7 @@ if (isset($_POST['update_product'])) {
         is_featured='$is_featured'
     ";
 
-    /* UPDATE IMAGE */
+    /* UPDATE MAIN IMAGE */
     if (!empty($_FILES['image']['name'])) {
 
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
@@ -264,6 +349,11 @@ if (isset($_POST['update_product'])) {
     $query .= " WHERE id='$id'";
 
     $conn->query($query);
+
+    /* ADD NEW GALLERY IMAGES (keeps existing ones, doesn't overwrite) */
+    if (!empty($_FILES['images']['name'][0])) {
+        save_gallery_images($conn, $id, $_FILES['images']);
+    }
 
     /* DELETE OLD VARIATIONS */
     $conn->query("
@@ -516,11 +606,11 @@ $products = $conn->query("
 
                     </div>
 
-                    <!-- IMAGE -->
-                    <div class="col-md-12 mb-4">
+                    <!-- MAIN IMAGE -->
+                    <div class="col-md-6 mb-4">
 
                         <label class="form-label">
-                            Product Image
+                            Main Product Image
                         </label>
 
                         <input type="file"
@@ -528,7 +618,65 @@ $products = $conn->query("
                                class="form-control"
                                accept=".jpg,.jpeg,.png,.webp">
 
+                        <small class="text-muted">
+                            Shown as the primary thumbnail
+                        </small>
+
                     </div>
+
+                    <!-- GALLERY IMAGES -->
+                    <div class="col-md-6 mb-4">
+
+                        <label class="form-label">
+                            Additional Images (multiple)
+                        </label>
+
+                        <input type="file"
+                               name="images[]"
+                               class="form-control"
+                               accept=".jpg,.jpeg,.png,.webp"
+                               multiple>
+
+                        <small class="text-muted">
+                            Hold Ctrl / Cmd to select several files
+                        </small>
+
+                    </div>
+
+                    <!-- EXISTING GALLERY (EDIT MODE ONLY) -->
+                    <?php if ($edit_data && !empty($edit_images)) { ?>
+
+                        <div class="col-md-12 mb-4">
+
+                            <label class="form-label">
+                                Existing Gallery Images
+                            </label>
+
+                            <div class="d-flex flex-wrap gap-2">
+
+                                <?php foreach ($edit_images as $img) { ?>
+
+                                    <div class="position-relative">
+
+                                        <img src="../uploads/<?php echo htmlspecialchars($img['image']); ?>"
+                                             style="width:90px;height:90px;object-fit:cover;border-radius:6px;">
+
+                                        <a href="products.php?delete_image=<?php echo $img['id']; ?>&product_id=<?php echo $edit_data['id']; ?>"
+                                           class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                           style="padding:2px 6px;"
+                                           onclick="return confirm('Remove this image?')">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+
+                                    </div>
+
+                                <?php } ?>
+
+                            </div>
+
+                        </div>
+
+                    <?php } ?>
 
                 </div>
 

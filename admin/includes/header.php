@@ -108,11 +108,6 @@ if (!isset($_SESSION['admin'])) {
 
 <body id="body">
 
-<!-- THEME BUTTON -->
-<button id="themeBtn" class="btn btn-light btn-theme" onclick="toggleTheme()">
-    <i class="fa fa-moon"></i>
-</button>
-
 <!-- SIDEBAR -->
 <div class="sidebar">
     <h4>Admin Panel</h4>
